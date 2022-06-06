@@ -6,6 +6,12 @@ import sqlite3
 import os
 
 
+#запуск из config
+#import config
+#GROUP_ID = config.GROUP_ID
+#ADMIN = config.ADMIN
+#bot = Bot(token=config.TOKEN)
+
 storage = MemoryStorage()
 bot = Bot(token=os.getenv('TOKEN'))
 ADMIN = int(os.getenv('ADMINID'))

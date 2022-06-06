@@ -15,16 +15,16 @@ async def privet(message: types.Message):
         keyboard.add(types.InlineKeyboardButton(text="Рассылка"))
         keyboard.add(types.InlineKeyboardButton(text="Добавить в ЧС"))
         keyboard.add(types.InlineKeyboardButton(text="Убрать из ЧС"))
-        await bot.send_message(message.from_user.id, 'Добро пожаловать в Админ-Панель! Выберите действие на клавиатуре', reply_markup=keyboard)
+        await bot.send_message(message.from_user.id, f'{message.from_user.first_name}. Добро пожаловать в Админ-Панель! Выберите действие на клавиатуре', reply_markup=keyboard)
         
     else:
-        await message.answer('Привет')
+        await message.answer(f'{message.from_user.first_name}. У Вас нет прав администратора.')
         if result is None:
             cur = conn.cursor()
-            cur.execute(f'''SELECT * FROM users WHERE (user_id="{message.from_user.id}")''')
+            cur.execute(f"SELECT * FROM users WHERE (user_id='{message.from_user.id}')")
             rez = cur.fetchone()
             if rez is None:
-                cur.execute(f'''INSERT INTO users VALUES ('{message.from_user.id}', '0')''')
+                cur.execute(f"INSERT INTO users VALUES ('{message.from_user.id}', '0')")
             conn.commit()
             
         

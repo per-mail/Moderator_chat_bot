@@ -3,16 +3,8 @@ from aiogram.utils import executor
 
 from create_bot import dp
 
-
-
-
 # log
 logging.basicConfig(level=logging.INFO)
-
-
-
-
-
 
 # функция оповещение о старте
 async def on_startup(_):
