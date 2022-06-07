@@ -1,9 +1,3 @@
-# добавление
-# бан метод
-# ошибка нет в чате
-
-
-
 #video https://www.youtube.com/watch?v=MEj4J0y4GwU&list=PLNi5HdK6QEmX1OpHj0wvf8Z28NYoV5sBJ&index=5&t=387s
 from aiogram import types, executor,  Dispatcher
 from create_bot import dp, bot, conn, cur
@@ -12,7 +6,7 @@ from aiogram.types import Message
 from aiogram.dispatcher import FSMContext
 import json, string
 from filters import IsAdminFilter
-from create_bot import bot, GROUP_ID
+from create_bot import bot, GROUP_ID, BOT_ID
 
 
 
@@ -43,11 +37,14 @@ async def on_user(message: types.Message, state: FSMContext):
 #@dp.message_handler(content_types=["left_chat_member"])
 async def out(message: types.Message, state: FSMContext):    
     await message.delete()
-    await bot.send_message(message.from_user.id, f'{message.from_user.first_name} жаль, что Вы покинули чат. Возвращайтесь обратно!.')
+    if message.from_user.id != BOT_ID:# проверяем что это пользователь сам удаляется из чата
+       await bot.send_message(message.from_user.id, f'{message.from_user.first_name} жаль, что Вы покинули чат. Возвращайтесь обратно!.')
+        
+        
+    
+    
    
                       
-
-
 #  удаление из группы
 #@dp.message_handler(is_admin=True, commands=["weg"], commands_prefix="!/")
 async def weg(message: types.Message, state: FSMContext):
@@ -55,17 +52,16 @@ async def weg(message: types.Message, state: FSMContext):
         await bot.send_message(message.from_user.id, f'{message.from_user.first_name} выберите кого нужно удалить?')
         await message.bot.delete_message(GROUP_ID, message.message_id)
         return
+    await message.bot.kick_chat_member(chat_id=GROUP_ID, user_id=message.reply_to_message.from_user.id)
+    await message.bot.delete_message(GROUP_ID, message.message_id)
     cur = conn.cursor()
     cur.execute(f"SELECT block FROM users WHERE user_id = {message.reply_to_message.from_user.id}")
     result = cur.fetchall()
     conn.commit()
     if len(result) == 0:
-        await bot.send_message(message.from_user.id, f'{message.reply_to_message.from_user.first_name} не найден в базе данных.')
-        await message.bot.delete_message(GROUP_ID, message.message_id)
+        await bot.send_message(message.from_user.id, f'{message.reply_to_message.from_user.first_name} не найден в базе данных.')        
         await state.finish()  
-    else:
-        await message.bot.delete_message(GROUP_ID, message.message_id)
-        await bot.ban_chat_member(chat_id=GROUP_ID, user_id=message.reply_to_message.from_user.id)
+    else:              
         await bot.send_message(message.from_user.id, f'{message.reply_to_message.from_user.first_name} удалён!')
         await bot.send_message(message.reply_to_message.from_user.id, f'{message.reply_to_message.from_user.first_name}. Вас удалили из группы за нарушение правил!')
         a = result[0]  # здесь мы извлекаем 1 или 0 из 1, или 0, которая приходит из базы         
@@ -76,7 +72,39 @@ async def weg(message: types.Message, state: FSMContext):
                 await state.finish()
         else:
                 await bot.send_message(message.from_user.id, f'{message.reply_to_message.from_user.first_name} уже получал предупреждение.')
+
+
+
+
+#  удаление из группы баном
+#@dp.message_handler(is_admin=True, commands=["wegban"], commands_prefix="!/")
+async def wegban(message: types.Message):
+    if not message.reply_to_message:        
+        await bot.send_message(message.from_user.id, f'{message.from_user.first_name} выберите кого нужно удалить?')
+        await message.bot.delete_message(GROUP_ID, message.message_id)
+        return
+    else:    
+         await message.bot.delete_message(GROUP_ID, message.message_id)
+         await bot.ban_chat_member(chat_id=GROUP_ID, user_id=message.reply_to_message.from_user.id)
+         await bot.send_message(message.from_user.id, f'{message.reply_to_message.from_user.first_name} удалён!')
+         await bot.send_message(message.reply_to_message.from_user.id, f'{message.reply_to_message.from_user.first_name}. Вас удалили из группы за нарушение правил!')
+                 
+
+# убираем бан в Телеграм
+#@dp.message_handler(is_admin=True, commands=["unban"], commands_prefix="!/")
+async def unban(message: types.Message):
+    if not message.reply_to_message:        
+        await bot.send_message(message.from_user.id, f'{message.from_user.first_name} выберите кого нужно удалить?')
+        await message.bot.delete_message(GROUP_ID, message.message_id)
+        return
+    else: 
+        await message.bot.delete_message(GROUP_ID, message.message_id)
+        await bot.unban_chat_member(chat_id=GROUP_ID, user_id=message.reply_to_message.from_user.id)
+        await bot.send_message(message.from_user.id, f'{message.reply_to_message.from_user.first_name} разбанен')
+        await bot.send_message(message.reply_to_message.from_user.id, f'{message.reply_to_message.from_user.first_name}. Вам сняли бан!')
+      
             
+
                   
     
 
@@ -107,7 +135,8 @@ async def ban(message: types.Message, state: FSMContext):
         else:
             await bot.send_message(message.from_user.id, f'{message.reply_to_message.from_user.first_name} уже получил бан')
             await state.finish()
-            
+
+
                 
 
 # убираем пользователя из чёрного списка в чате
@@ -190,6 +219,8 @@ def register_handlers_other(dp : Dispatcher):
     dp.register_message_handler(on_user, content_types=["new_chat_members"])
     dp.register_message_handler(out, content_types=["left_chat_member"])
     dp.register_message_handler(weg, is_admin=True, commands=["weg"], commands_prefix="!/")
+    dp.register_message_handler(wegban, is_admin=True, commands=["wegban"], commands_prefix="!/")
+    dp.register_message_handler(unban, is_admin=True, commands=["unban"], commands_prefix="!/")
     dp.register_message_handler(ban, is_admin=True, commands=["ban"], commands_prefix="!/")
     dp.register_message_handler(free, is_admin=True, commands=["free"], commands_prefix="!/")
     dp.register_message_handler(cmd_id, is_admin=True, commands=["id"], commands_prefix="!/")

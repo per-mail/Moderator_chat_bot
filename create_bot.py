@@ -10,11 +10,13 @@ import os
 #import config
 #GROUP_ID = config.GROUP_ID
 #ADMIN = config.ADMIN
+#BOT_ID = config.BOT
 #bot = Bot(token=config.TOKEN)
 
 storage = MemoryStorage()
 bot = Bot(token=os.getenv('TOKEN'))
 ADMIN = int(os.getenv('ADMINID'))
+BOT_ID = int(os.getenv('BOTID'))
 GROUP_ID = int(os.getenv('GROUPID'))
 
 dp = Dispatcher(bot, storage=storage)
