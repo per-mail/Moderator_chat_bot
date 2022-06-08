@@ -5,7 +5,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import Message
 from aiogram.dispatcher import FSMContext
 
-from create_bot import bot, ADMIN
+from create_bot import bot, ADMIN, GROUP_ID
 
 
 
@@ -24,7 +24,7 @@ async def spam(message: Message):
     else:
         await message.answer(f'{message.from_user.first_name}. Вы не являетесь администратором чата')
        
-        
+#Здесь и далее берём user_id из message.text из текста сообщения или из текста который приходит из базы.      
 
 #@dp.message_handler(state=dialog.spam)
 async def start_spam(message: Message, state: FSMContext):
@@ -68,7 +68,9 @@ async def hanadler(message: types.Message, state: FSMContext):
         await message.answer(
             f'{message.from_user.first_name}. Введите id пользователя, которого нужно заблокировать.\nДля отмены нажмите кнопку ниже',
             reply_markup=keyboard)
+#подключаемся к базе
         await dialog.blacklist.set()
+        
 
 
 #@dp.message_handler(state=dialog.blacklist)
@@ -80,10 +82,10 @@ async def proce(message: types.Message, state: FSMContext):
         keyboard.add(types.InlineKeyboardButton(text="Убрать из ЧС"))
         await message.answer('Отмена!', reply_markup=keyboard)
         await state.finish()
-    else:
-        if message.text.isdigit():
+    else:        
+        if message.text.isdigit():# проверяем что все символы цифры
             cur = conn.cursor()
-            cur.execute(f'SELECT block FROM users WHERE user_id = {message.text}')
+            cur.execute(f'SELECT block FROM users WHERE user_id = {message.text}') #берём user_id из message.text и ищём есть ли он в базе
             result = cur.fetchall()
             conn.commit()
             if len(result) == 0:
@@ -112,6 +114,9 @@ async def proce(message: types.Message, state: FSMContext):
                     keyboard.add(types.InlineKeyboardButton(text="Добавить в ЧС"))
                     keyboard.add(types.InlineKeyboardButton(text="Убрать из ЧС"))
                     await message.answer('Данный пользователь уже получил бан', reply_markup=keyboard)
+                    #вводим ограничения на пользователя
+                    await bot.restrict_chat_member(chat_id=GROUP_ID, user_id=message.text)#берём user_id из message.text и ищём есть ли он в базе
+                    await bot.send_message(message.tex, 'Вы получили ограничения')
                     await state.finish()
         else:
             await message.answer(f'{message.from_user.first_name}. Ты вводишь буквы...\n\nВведи ID')
