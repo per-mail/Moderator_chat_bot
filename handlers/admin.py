@@ -115,8 +115,8 @@ async def proce(message: types.Message, state: FSMContext):
                     keyboard.add(types.InlineKeyboardButton(text="Убрать из ЧС"))
                     await message.answer('Данный пользователь уже получил бан', reply_markup=keyboard)
                     #вводим ограничения на пользователя
-                    await bot.restrict_chat_member(chat_id=GROUP_ID, user_id=message.text)#берём user_id из message.text и ищём есть ли он в базе
-                    await bot.send_message(message.tex, 'Вы получили ограничения')
+                    await bot.restrict_chat_member(chat_id=GROUP_ID, user_id=message.text)#берём user_id из message.text
+                    await bot.send_message(message.text, 'Вы получили ограничения')
                     await state.finish()
         else:
             await message.answer(f'{message.from_user.first_name}. Ты вводишь буквы...\n\nВведи ID')
