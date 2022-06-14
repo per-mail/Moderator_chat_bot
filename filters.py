@@ -1,20 +1,15 @@
 from aiogram import types
 from aiogram.dispatcher.filters import BoundFilter
 
+
+#is_admin() — проверяет, является ли текущий пользователь админом
 class IsAdminFilter(BoundFilter):
-    key = "is_admin"
+    key = 'is_admin'
 
     def __init__(self, is_admin):
         self.is_admin = is_admin
 
 
-
-   # def__init__(self, is_admin):
-    #   self.is_admin = Is_admin
-
-
-
-
-    async def check(self, message: types.Message):
+    async def check(self, message: types.Message):        
         member = await message.bot.get_chat_member(message.chat.id, message.from_user.id)
         return member.is_chat_admin()
