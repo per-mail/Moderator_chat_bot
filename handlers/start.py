@@ -1,10 +1,12 @@
 #video https://www.youtube.com/watch?v=MEj4J0y4GwU&list=PLNi5HdK6QEmX1OpHj0wvf8Z28NYoV5sBJ&index=5&t=387s
 from aiogram import types, executor, Dispatcher
-from create_bot import dp, bot, conn, cur, BOT_ID, OWNER_ID, GROUP_ID
+from create import dp, bot, conn, cur, BOT_ID, OWNER_ID, GROUP_ID
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import Message
-from filters import IsAdminFilter
-from test import moderators
+
+
+from admins_filter import moderators, ADMINS_LIST
+
 
 async def vchod(message: types.Message):
 
@@ -22,10 +24,9 @@ async def vchod(message: types.Message):
     #for q in result:
        #w = q[0] # здесь мы избавляемся от запятой        
        #ADMINS_LIST.append(w)
-    
-    moderators()
-    #ADMINS_LIST = moderators.ADMINS_LIST
-    if message.from_user.id == OWNER_ID:           
+# получаем список админов 2 способ, мой с функцией
+    moderators() 
+    if message.from_user.id in ADMINS_LIST:           
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         keyboard.add(types.InlineKeyboardButton(text="Рассылка"))
         keyboard.add(types.InlineKeyboardButton(text="Добавить в ЧС"))
@@ -42,10 +43,10 @@ async def vchod(message: types.Message):
     rez = cur.fetchone()
     if rez is None:
         cur.execute(f"INSERT INTO users VALUES ('{message.from_user.id}', 'False', 'False')")
-    conn.commit()             
+    conn.commit()          
         
 
-def register_handlers_client(dp : Dispatcher):
+def register_handlers_start(dp : Dispatcher):
     dp.register_message_handler(vchod, commands=['start', 'старт'])
     
     

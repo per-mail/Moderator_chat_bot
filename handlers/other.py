@@ -1,13 +1,13 @@
 #video https://www.youtube.com/watch?v=MEj4J0y4GwU&list=PLNi5HdK6QEmX1OpHj0wvf8Z28NYoV5sBJ&index=5&t=387s
 from aiogram import types, executor,  Dispatcher
-from create_bot import dp, bot, conn, cur, GROUP_ID, OWNER_ID, BOT_ID
+from create import dp, bot, conn, cur, GROUP_ID, OWNER_ID, BOT_ID
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import Message
 from aiogram.dispatcher import FSMContext
 import json, string
-from filters import IsAdminFilter
+from filter_chat import IsAdminFilter
 from aiogram.types.chat_permissions import ChatPermissions
-
+from admins_filter import moderators, ADMINS_LIST
 
 # Окрытая группа приветствие, удаленние записи, внесение в базу, удаление пользователей которые в чёрном списке
 #@dp.message_handler(content_types=["new_chat_members"])
@@ -37,18 +37,9 @@ async def on_user(message: types.Message, state: FSMContext):
 async def out(message: types.Message):     
     await message.delete()
 # проверяем есть ли пользователь в списке админов    
-   # получаем список админов 2 способ, мой
-    cur = conn.cursor()
-    cur.execute(f"SELECT user_id FROM users WHERE admin = 'True'")
-    result = cur.fetchall()# получаем id пользователей с правом доступа из базы    
-    conn.commit()
-    # создаём ADMINS_LIST и вносим сразу OWNER_ID и BOT_ID в список админов
-    ADMINS_LIST = [OWNER_ID, BOT_ID]    
-    for q in result:
-       w = q[0] # здесь мы избавляемся от запятой        
-       ADMINS_LIST.append(w)  
-    if message.from_user.id not in ADMINS_LIST:  # проверяем что это пользователь сам удаляется из чата 
-    #if message.from_user.id != BOT_ID and message.from_user.id != ADMIN:
+# получаем список админов 2 способ, мой с функцией
+    moderators()
+    if message.from_user.id not in ADMINS_LIST:  # проверяем что это пользователь сам удаляется из чата     
         await bot.send_message(message.from_user.id, f'{message.from_user.first_name} жаль, что Вы покинули чат. Возвращайтесь обратно!.') 
                       
 
@@ -241,18 +232,18 @@ async def cmd_first_name(message: types.Message):
 def register_handlers_other(dp : Dispatcher):
     dp.register_message_handler(on_user, content_types=["new_chat_members"])    
     dp.register_message_handler(out, content_types=["left_chat_member"])
-    dp.register_message_handler(weg, is_admin=True, commands=["weg", "вег"], commands_prefix="!/")
-    dp.register_message_handler(wegban, is_admin=True, commands=["wegban"], commands_prefix="!/")
-    dp.register_message_handler(unban, is_admin=True, commands=["unban"], commands_prefix="!/")
-    dp.register_message_handler(ban, is_admin=True, commands=["ban"], commands_prefix="!/")
-    dp.register_message_handler(free, is_admin=True, commands=["free"], commands_prefix="!/")
-    dp.register_message_handler(cmd_id, is_admin=True, commands=["id"], commands_prefix="!/")
-    dp.register_message_handler(cmd_username, is_admin=True, commands=["un"], commands_prefix="!/")    
-    dp.register_message_handler(baza, is_admin=True, commands=["bd"], commands_prefix="!/")
-    dp.register_message_handler(cmd_first_name, is_admin=True, commands=["fn"], commands_prefix="!/")
-    dp.register_message_handler(cmd_prom, is_admin=True, commands=["prom"], commands_prefix="!/")
-    dp.register_message_handler(cmd_res, is_admin=True, commands=["res"], commands_prefix="!/")
-    dp.register_message_handler(cmd_unres, is_admin=True, commands=["unres"], commands_prefix="!/")
+    dp.register_message_handler(weg, chat_admin=True, commands=["weg", "вег"], commands_prefix="!/")
+    dp.register_message_handler(wegban, chat_admin=True, commands=["wegban"], commands_prefix="!/")
+    dp.register_message_handler(unban, chat_admin=True, commands=["unban"], commands_prefix="!/")
+    dp.register_message_handler(ban, chat_admin=True, commands=["ban"], commands_prefix="!/")
+    dp.register_message_handler(free, chat_admin=True, commands=["free"], commands_prefix="!/")
+    dp.register_message_handler(cmd_id, chat_admin=True, commands=["id"], commands_prefix="!/")
+    dp.register_message_handler(cmd_username, chat_admin=True, commands=["un"], commands_prefix="!/")    
+    dp.register_message_handler(baza, chat_admin=True, commands=["bd"], commands_prefix="!/")
+    dp.register_message_handler(cmd_first_name, chat_admin=True, commands=["fn"], commands_prefix="!/")
+    dp.register_message_handler(cmd_prom, chat_admin=True, commands=["prom"], commands_prefix="!/")
+    dp.register_message_handler(cmd_res, chat_admin=True, commands=["res"], commands_prefix="!/")
+    dp.register_message_handler(cmd_unres, chat_admin=True, commands=["unres"], commands_prefix="!/")
     
     
     

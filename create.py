@@ -1,6 +1,6 @@
 from aiogram import Bot
 from aiogram.dispatcher import Dispatcher
-from filters import IsAdminFilter
+from filter_chat import IsAdminFilter
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import sqlite3
 import os
