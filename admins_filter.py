@@ -2,6 +2,8 @@
 from aiogram import types
 from create import conn, cur, OWNER_ID, BOT_ID
 
+
+
 DEFAULT_LIST = [BOT_ID] 
 ADMINS_LIST = [] 
 def moderators():

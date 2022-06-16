@@ -3,9 +3,9 @@ from aiogram import types, executor, Dispatcher
 from create import dp, bot, conn, cur, BOT_ID, OWNER_ID, GROUP_ID
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import Message
+from test import AdminFilter
 
-
-from admins_filter import moderators, ADMINS_LIST
+#from admins_filter import moderators, ADMINS_LIST
 
 
 async def vchod(message: types.Message):
@@ -25,8 +25,8 @@ async def vchod(message: types.Message):
        #w = q[0] # здесь мы избавляемся от запятой        
        #ADMINS_LIST.append(w)
 # получаем список админов 2 способ, мой с функцией
-    moderators() 
-    if message.from_user.id in ADMINS_LIST:           
+    #moderators() 
+    #if message.from_user.id in ADMINS_LIST:           
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         keyboard.add(types.InlineKeyboardButton(text="Рассылка"))
         keyboard.add(types.InlineKeyboardButton(text="Добавить в ЧС"))
@@ -35,19 +35,13 @@ async def vchod(message: types.Message):
         keyboard.add(types.InlineKeyboardButton(text="Убрать из списка админов"))
         await bot.send_message(message.from_user.id, f'{message.from_user.first_name}. Добро пожаловать в Админ-Панель! Выберите действие на клавиатуре', reply_markup=keyboard)
         
-    else:
-        await message.answer(f'{message.from_user.first_name}. У Вас нет прав администратора.')
-        
-    cur = conn.cursor()
-    cur.execute(f"SELECT * FROM users WHERE (user_id='{message.from_user.id}')")
-    rez = cur.fetchone()
-    if rez is None:
-        cur.execute(f"INSERT INTO users VALUES ('{message.from_user.id}', 'False', 'False')")
-    conn.commit()          
+    #else:
+       # await message.answer(f'{message.from_user.first_name}. У Вас нет прав администратора.')
         
 
+
 def register_handlers_start(dp : Dispatcher):
-    dp.register_message_handler(vchod, commands=['start', 'старт'])
+    dp.register_message_handler(vchod, admin=True, commands=['start', 'старт'])
     
     
 

@@ -1,6 +1,7 @@
 from aiogram import Bot
 from aiogram.dispatcher import Dispatcher
 from filter_chat import IsAdminFilter
+from test import AdminFilter
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import sqlite3
 import os
@@ -21,7 +22,7 @@ BOT_ID = int(os.getenv('BOTID'))
 
 dp = Dispatcher(bot, storage=storage)
 dp.filters_factory.bind(IsAdminFilter)
-
+dp.filters_factory.bind(AdminFilter)
 
     
 conn = sqlite3.connect('db.db')

@@ -52,7 +52,9 @@ async def spam(message: Message):
 
 #@dp.message_handler(state=dialog.spam)
 async def start_spam(message: Message, state: FSMContext):
-    if message.text != 'Назад':
+    if message.text == 'Назад':
+        back(message)
+    else:
         cur = conn.cursor()
         cur.execute(f"SELECT user_id FROM users WHERE admin = 'False'")
         #cur.execute(f'SELECT user_id FROM users')
@@ -70,15 +72,9 @@ async def start_spam(message: Message, state: FSMContext):
         keyboard.add(types.InlineKeyboardButton(text="Убрать из списка админов"))
         await message.answer(f'{message.from_user.first_name}. Рассылка завершена', reply_markup=keyboard)
         await state.finish()
-    else:
-        keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        keyboard.add(types.InlineKeyboardButton(text="Рассылка"))
-        keyboard.add(types.InlineKeyboardButton(text="Добавить в ЧС"))
-        keyboard.add(types.InlineKeyboardButton(text="Убрать из ЧС"))
-        keyboard.add(types.InlineKeyboardButton(text="Добавить в список админов"))
-        keyboard.add(types.InlineKeyboardButton(text="Убрать из списка админов"))
-        await message.answer(f'{message.from_user.first_name}. Рассылка остановлена', reply_markup=keyboard)
-    pass
+    
+        
+    
         
     
 
