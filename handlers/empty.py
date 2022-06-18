@@ -18,7 +18,6 @@ async def filter_message(message: types.Message, state: FSMContext):
     rez = cur.fetchone()
     if rez is None:
         cur.execute(f"INSERT INTO users VALUES ('{message.from_user.id}', 'False', 'False')")
-    conn.commit()
     cur = conn.cursor()
     cur.execute(f"SELECT block FROM users WHERE user_id = {message.from_user.id}")
     result = cur.fetchall()           
@@ -41,7 +40,6 @@ async def filter_message(message: types.Message, state: FSMContext):
             if d == 'False':
                 await message.delete()
                 cur.execute(f"UPDATE users SET block = 'True' WHERE user_id = {message.from_user.id}")                    
-                conn.commit()
                 await message.answer(f'{message.from_user.first_name} успешно добавлен в ЧС.')
                 await state.finish()  
                 await bot.send_message(message.from_user.id, f'{message.from_user.first_name}. Вы получили предупреждение')   
@@ -63,7 +61,7 @@ async def link(message: types.Message, state: FSMContext):
     rez = cur.fetchone()
     if rez is None:
         cur.execute(f"INSERT INTO users VALUES ('{message.from_user.id}', 'False', 'False')")
-    conn.commit()
+    
 
     cur.execute(f"SELECT block FROM users WHERE user_id = {message.from_user.id}")
     result = cur.fetchall()

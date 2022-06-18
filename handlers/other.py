@@ -1,11 +1,12 @@
 #video https://www.youtube.com/watch?v=MEj4J0y4GwU&list=PLNi5HdK6QEmX1OpHj0wvf8Z28NYoV5sBJ&index=5&t=387s
 from aiogram import types, executor,  Dispatcher
 from create import dp, bot, conn, cur, GROUP_ID, OWNER_ID, BOT_ID
-from aiogram.dispatcher.filters.state import State, StatesGroup
+#from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import Message
 from aiogram.dispatcher import FSMContext
 import json, string
-from filter_chat import IsAdminFilter
+#from filter_chat import IsAdminFilter
+from adm_filter import AdminFilter
 from aiogram.types.chat_permissions import ChatPermissions
 from admins_filter import moderators, ADMINS_LIST
 
@@ -17,7 +18,6 @@ async def on_user(message: types.Message, state: FSMContext):
     rez = cur.fetchone()
     if rez is None:
         cur.execute(f"INSERT INTO users VALUES ('{message.from_user.id}', 'False', 'False')")
-    conn.commit()
     await message.delete()
     cur = conn.cursor()
     cur.execute(f"SELECT block FROM users WHERE user_id = {message.from_user.id}")
@@ -37,15 +37,12 @@ async def on_user(message: types.Message, state: FSMContext):
 async def out(message: types.Message):     
     await message.delete()
 # проверяем есть ли пользователь в списке админов    
-# получаем список админов 2 способ, мой с функцией
+# получаем список админов 2 способ, мой с admins_filter
     moderators()
     if message.from_user.id not in ADMINS_LIST:  # проверяем что это пользователь сам удаляется из чата     
         await bot.send_message(message.from_user.id, f'{message.from_user.first_name} жаль, что Вы покинули чат. Возвращайтесь обратно!.') 
                       
-
-    
-              
-                      
+  
 #  удаление из группы
 #@dp.message_handler(is_admin=True, commands=["weg", "вег"], commands_prefix="!/")
 async def weg(message: types.Message, state: FSMContext):
@@ -69,7 +66,6 @@ async def weg(message: types.Message, state: FSMContext):
         d = a[0]
         if d == 'False':
                 cur.execute(f"UPDATE users SET block = 'True' WHERE user_id = {message.reply_to_message.from_user.id}")                    
-                conn.commit()                       
                 await state.finish()
         else:
                 await bot.send_message(message.from_user.id, f'{message.reply_to_message.from_user.first_name} уже получал предупреждение.')
@@ -114,10 +110,9 @@ async def ban(message: types.Message, state: FSMContext):
         await message.bot.delete_message(GROUP_ID, message.message_id)
         return
     await message.delete()
-    cur = conn.cursor()
+    
     cur.execute(f"SELECT block FROM users WHERE user_id = {message.reply_to_message.from_user.id}")
     result = cur.fetchall()
-    conn.commit()
     if len(result) == 0:
         await bot.send_message(message.from_user.id, f'{message.reply_to_message.from_user.first_name} не найден в базе данных.')
         await state.finish() 
@@ -126,7 +121,6 @@ async def ban(message: types.Message, state: FSMContext):
         d = a[0]
         if d == 'False':
             cur.execute(f"UPDATE users SET block = 'True' WHERE user_id = {message.reply_to_message.from_user.id}")
-            conn.commit()
             await bot.send_message(message.reply_to_message.from_user.id, f'{message.reply_to_message.from_user.first_name}. Администратор добавил Вас в чёрный список!')
             await bot.send_message(message.from_user.id, f'{message.reply_to_message.from_user.first_name} забанен.')
             await state.finish()         
@@ -148,7 +142,6 @@ async def free(message: types.Message, state: FSMContext):
     cur = conn.cursor()
     cur.execute(f"SELECT block FROM users WHERE user_id = {message.reply_to_message.from_user.id}")
     result = cur.fetchall()
-    conn.commit()
     if len(result) == 0:
         await bot.send_message(message.from_user.id, f'{message.reply_to_message.from_user.first_name} не найден в базе данных.')
         await state.finish() 
@@ -156,7 +149,7 @@ async def free(message: types.Message, state: FSMContext):
         a = result[0]      # здесь мы избавляемся от запятой                            
         d = a[0]
         if d == 'True':
-            cur.execute(f"UPDATE users SET block = 0 WHERE user_id = {message.reply_to_message.from_user.id}")
+            cur.execute(f"UPDATE users SET block = 'False' WHERE user_id = {message.reply_to_message.from_user.id}")
             conn.commit()
             await bot.send_message(message.reply_to_message.from_user.id, f'{message.reply_to_message.from_user.first_name}. Администратор убрал Вас из чёрного списка!')
             await bot.send_message(message.from_user.id, f'{message.reply_to_message.from_user.first_name} разбанен.')
@@ -184,7 +177,6 @@ async def baza(message: types.Message, state: FSMContext):
     else:
         await message.delete()
         cur.execute(f"DELETE FROM users WHERE user_id = {message.reply_to_message.from_user.id}")
-        conn.commit()
         await bot.send_message(message.from_user.id, f'{message.reply_to_message.from_user.first_name} удалён из базы!')
         await state.finish() 
 
@@ -232,18 +224,18 @@ async def cmd_first_name(message: types.Message):
 def register_handlers_other(dp : Dispatcher):
     dp.register_message_handler(on_user, content_types=["new_chat_members"])    
     dp.register_message_handler(out, content_types=["left_chat_member"])
-    dp.register_message_handler(weg, chat_admin=True, commands=["weg", "вег"], commands_prefix="!/")
-    dp.register_message_handler(wegban, chat_admin=True, commands=["wegban"], commands_prefix="!/")
-    dp.register_message_handler(unban, chat_admin=True, commands=["unban"], commands_prefix="!/")
-    dp.register_message_handler(ban, chat_admin=True, commands=["ban"], commands_prefix="!/")
-    dp.register_message_handler(free, chat_admin=True, commands=["free"], commands_prefix="!/")
-    dp.register_message_handler(cmd_id, chat_admin=True, commands=["id"], commands_prefix="!/")
-    dp.register_message_handler(cmd_username, chat_admin=True, commands=["un"], commands_prefix="!/")    
-    dp.register_message_handler(baza, chat_admin=True, commands=["bd"], commands_prefix="!/")
-    dp.register_message_handler(cmd_first_name, chat_admin=True, commands=["fn"], commands_prefix="!/")
-    dp.register_message_handler(cmd_prom, chat_admin=True, commands=["prom"], commands_prefix="!/")
-    dp.register_message_handler(cmd_res, chat_admin=True, commands=["res"], commands_prefix="!/")
-    dp.register_message_handler(cmd_unres, chat_admin=True, commands=["unres"], commands_prefix="!/")
+    dp.register_message_handler(weg, admin=True, commands=["weg", "вег"], commands_prefix="!/")
+    dp.register_message_handler(wegban, admin=True, commands=["wegban"], commands_prefix="!/")
+    dp.register_message_handler(unban, admin=True, commands=["unban"], commands_prefix="!/")
+    dp.register_message_handler(ban, admin=True, commands=["ban"], commands_prefix="!/")
+    dp.register_message_handler(free, admin=True, commands=["free"], commands_prefix="!/")
+    dp.register_message_handler(cmd_id, admin=True, commands=["id"], commands_prefix="!/")
+    dp.register_message_handler(cmd_username, admin=True, commands=["un"], commands_prefix="!/")    
+    dp.register_message_handler(baza, admin=True, commands=["bd"], commands_prefix="!/")
+    dp.register_message_handler(cmd_first_name, admin=True, commands=["fn"], commands_prefix="!/")
+    dp.register_message_handler(cmd_prom, admin=True, commands=["prom"], commands_prefix="!/")
+    dp.register_message_handler(cmd_res, admin=True, commands=["res"], commands_prefix="!/")
+    dp.register_message_handler(cmd_unres, admin=True, commands=["unres"], commands_prefix="!/")
     
     
     

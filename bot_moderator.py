@@ -3,6 +3,11 @@ from aiogram.utils import executor
 
 from create import dp
 
+#делаем импорт из фильтра adm_filter здесь, чтобы не было зацикливания
+from adm_filter import AdminFilter
+dp.filters_factory.bind(AdminFilter)
+
+
 # log
 logging.basicConfig(level=logging.INFO)
 

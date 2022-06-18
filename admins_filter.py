@@ -1,10 +1,9 @@
 #получаем список админов 2 способ, мой
-from aiogram import types
+
 from create import conn, cur, OWNER_ID, BOT_ID
 
 
-
-DEFAULT_LIST = [BOT_ID] 
+DEFAULT_LIST = [OWNER_ID, BOT_ID] 
 ADMINS_LIST = [] 
 def moderators():
 # удаляем старый список админов
@@ -19,10 +18,7 @@ def moderators():
     for q in result:
        w = q[0] # здесь мы избавляемся от запятой        
        ADMINS_LIST.append(w)
-    if message.from_user.id in ADMINS_LIST:
-        print('ADMIN tut')
-        
-    print(ADMINS_LIST)
+   
 
 
 

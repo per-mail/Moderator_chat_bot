@@ -1,10 +1,10 @@
 from aiogram import Bot
 from aiogram.dispatcher import Dispatcher
 from filter_chat import IsAdminFilter
-from test import AdminFilter
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import sqlite3
 import os
+
 
 
 #запуск из config
@@ -22,17 +22,30 @@ BOT_ID = int(os.getenv('BOTID'))
 
 dp = Dispatcher(bot, storage=storage)
 dp.filters_factory.bind(IsAdminFilter)
-dp.filters_factory.bind(AdminFilter)
+#dp.filters_factory.bind(AdminFilter)
 
-    
+#создание базы обычное    
+#conn = sqlite3.connect('db.db')
+#cur = conn.cursor()
+#cur.execute("""CREATE TABLE IF NOT EXISTS users(
+#   user_id INTEGER,
+#   block BOOLEAN,
+#   admin BOOLEAN);
+#""")
+
+#создание базы с autocommit
 conn = sqlite3.connect('db.db')
-cur = conn.cursor()
-cur.execute("""CREATE TABLE IF NOT EXISTS users(
-   user_id INTEGER,
-   block BOOLEAN,
-   admin BOOLEAN);
+# эта строка включает autocommit
+conn.isolation_level = None
+
+with conn:
+    try:
+        cur = conn.execute ("""CREATE TABLE IF NOT EXISTS users(
+                            user_id INTEGER,
+                            block BOOLEAN,
+                            admin BOOLEAN);
 """)
-
-
+    except sqlite3.Error as e:
+        print(Error)
 
 

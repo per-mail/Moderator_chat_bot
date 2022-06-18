@@ -1,16 +1,14 @@
 #video https://www.youtube.com/watch?v=MEj4J0y4GwU&list=PLNi5HdK6QEmX1OpHj0wvf8Z28NYoV5sBJ&index=5&t=387s
 from aiogram import types, executor, Dispatcher
-from create import dp, bot, conn, cur, BOT_ID, OWNER_ID, GROUP_ID
-from aiogram.dispatcher.filters.state import State, StatesGroup
+from create import dp, bot
+#from create import dp, bot, conn, cur, GROUP_ID, OWNER_ID, BOT_ID
+#from aiogram.dispatcher.filters.state import State, StatesGroup
+from adm_filter import AdminFilter
 from aiogram.types import Message
-from test import AdminFilter
-
 #from admins_filter import moderators, ADMINS_LIST
 
 
-async def vchod(message: types.Message):
-
-    
+async def vchod(message: types.Message):     
 # проверяем на право доступа
 # получаем список админов 1 способ
     #ADMINS_LIST = [admin.user.id for admin in await bot.get_chat_administrators(GROUP_ID)]    
@@ -24,7 +22,7 @@ async def vchod(message: types.Message):
     #for q in result:
        #w = q[0] # здесь мы избавляемся от запятой        
        #ADMINS_LIST.append(w)
-# получаем список админов 2 способ, мой с функцией
+# получаем список админов 2 способ, мой с admins_filter
     #moderators() 
     #if message.from_user.id in ADMINS_LIST:           
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -36,7 +34,7 @@ async def vchod(message: types.Message):
         await bot.send_message(message.from_user.id, f'{message.from_user.first_name}. Добро пожаловать в Админ-Панель! Выберите действие на клавиатуре', reply_markup=keyboard)
         
     #else:
-       # await message.answer(f'{message.from_user.first_name}. У Вас нет прав администратора.')
+       #await message.answer(f'{message.from_user.first_name}. У Вас нет прав администратора.')
         
 
 

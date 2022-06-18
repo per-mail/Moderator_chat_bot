@@ -2,10 +2,10 @@ from aiogram import types
 from aiogram.dispatcher.filters import BoundFilter
 
 
-
 #Классу фильтра должна быть присвоена переменная key
 class IsAdminFilter(BoundFilter):
     key = 'chat_admin'
+    
 
     def __init__(self, chat_admin):
         self.chat_admin = chat_admin
