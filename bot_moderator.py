@@ -26,4 +26,4 @@ empty.register_handlers_empty(dp)
 
 
 if __name__ == "__main__":
-    executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+    executor.start_polling(dp, skip_updates=True, on_startup=on_startup) # начать опрос сервера Телеграмм

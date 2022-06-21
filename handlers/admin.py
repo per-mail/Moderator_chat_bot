@@ -46,6 +46,7 @@ async def spam(message: Message):
         
 #Здесь и далее берём user_id из message.text из текста сообщения или из текста который приходит из базы.      
 
+# этот блок нужен, чтобы приостановить исполнение кода и ввести текст рассылки
 #@dp.message_handler(state=dialog.spam)
 async def start_spam(message: Message, state: FSMContext):
     if  message.text == 'Назад':
