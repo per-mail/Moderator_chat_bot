@@ -2,13 +2,13 @@
 
 from create import conn, cur, OWNER_ID, BOT_ID
 
-
+# добавляем в список по умолчанию владельца и бота
 DEFAULT_LIST = [OWNER_ID, BOT_ID] 
 ADMINS_LIST = [] 
 def moderators():
 # удаляем старый список админов
     ADMINS_LIST.clear()
-# добавляем в список по умолчанию владельца и бота  
+# добавляем в список ADMINS_LIST список DEFAULT_LIST  
     ADMINS_LIST.extend(DEFAULT_LIST)
     cur = conn.cursor()
     cur.execute(f"SELECT user_id FROM users WHERE admin = 'True'")
