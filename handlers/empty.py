@@ -51,11 +51,10 @@ async def filter_message(message: types.Message, state: FSMContext):
                 await bot.send_message(message.from_user.id, f'{message.from_user.first_name}. Вы получили ограничения за нарушение правил!') 
  
 # общение с ботом мпортируем функцию speak и передаём в неё message.text из чата
-# проверяем
-       # else:
-             #reply = speak(message.text)
-             #await message.reply(speak(message.text))
-             #await bot.send_message(GROUP_ID, reply)
+        else:
+             reply = speak(message.text)
+             await message.reply(speak(message.text))
+             await bot.send_message(GROUP_ID, reply)
              
             
 # Вариант закрытая группа(вход по приглашению) приветствие, удаленние записи, внесение в базу, не впускаем пользователей которые в чёрном списке
