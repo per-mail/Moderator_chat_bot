@@ -14,6 +14,9 @@ import os
 #GROUP_ID = config.GROUP_ID
 #bot = Bot(token=config.TOKEN)
 
+#указали хранилище состояний в оперативной памяти, так как потеря этих состояний
+#нам не страшна (да и этот вариант больше всего подходит для демонстрационных целей,
+#так как не требует настройки).
 storage = MemoryStorage()
 bot = Bot(token=os.getenv('TOKEN'))
 GROUP_ID = int(os.getenv('GROUPID'))

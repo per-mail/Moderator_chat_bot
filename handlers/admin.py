@@ -10,6 +10,8 @@ from adm_filter import AdminFilter
 from aiogram.types.chat_permissions import ChatPermissions
 from admins_filter import moderators, ADMINS_LIST
 
+#Перед тем как создать какое-либо состояние, нам нужно создать класс, где мы поочередно опишем все states
+#чтобы потом без проблем переключаться между ними
 class dialog(StatesGroup):
     spam = State()
     blacklist = State()
@@ -40,7 +42,7 @@ async def spam(message: Message):
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         keyboard.add(types.InlineKeyboardButton(text="Назад"))        
         await message.answer(f'{message.from_user.first_name} напиши текст рассылки или нажми кнопку назад', reply_markup=keyboard)
-        await dialog.spam.set()
+        await dialog.spam.set()#перключаем состояния
             
         
         
@@ -48,7 +50,7 @@ async def spam(message: Message):
 
 # этот блок нужен, чтобы приостановить исполнение кода и ввести текст рассылки
 #@dp.message_handler(state=dialog.spam)
-async def start_spam(message: Message, state: FSMContext):
+async def start_spam(message: Message, state: #FSMContext): state: FSMContext для того, чтобы мы могли записывать данные пользователя в память
     if  message.text == 'Назад':
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         keyboard.add(types.InlineKeyboardButton(text="Рассылка"))
@@ -57,7 +59,7 @@ async def start_spam(message: Message, state: FSMContext):
         keyboard.add(types.InlineKeyboardButton(text="Добавить в список админов"))
         keyboard.add(types.InlineKeyboardButton(text="Убрать из списка админов"))
         await message.answer(f'{message.from_user.first_name}. Рассылка прервана', reply_markup=keyboard)
-#
+#всё завершаем методом finish()
         await state.finish()
     else:
         cur = conn.cursor()

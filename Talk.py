@@ -134,7 +134,7 @@ def get_intent_ml(text):
     intent = model.predict(vec_text)[0]#предсказывает ответный интент, берём первый элемент[0]
     return intent
 
-
+#ищем интент в файле 
 def get_intent(text):
     for name, intent in BIG_CONFIG["intents"].items():
         for example in intent["examples"]:
@@ -143,6 +143,7 @@ def get_intent(text):
 
     return None
 
+print("Можно пообщаться !")
 
 def speak(phrase):
     phrase = filter_text(phrase)
@@ -162,5 +163,5 @@ def speak(phrase):
 #    msg = input()
 #    print("[BOT]" + speak(msg))
         
-print("Можно пообщаться !")
+
 
