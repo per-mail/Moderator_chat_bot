@@ -9,22 +9,7 @@ from aiogram.types import Message
 
 
 async def vchod(message: types.Message):     
-# проверяем на право доступа
-# получаем список админов 1 способ
-    #ADMINS_LIST = [admin.user.id for admin in await bot.get_chat_administrators(GROUP_ID)]    
-# получаем список админов 2 способ, мой
-    #cur = conn.cursor()
-    #cur.execute(f"SELECT user_id FROM users WHERE admin = 'True'")
-    #result = cur.fetchall()# получаем id пользователей с правом доступа из базы    
-    #conn.commit()
-    # создаём ADMINS_LIST и вносим сразу OWNER_ID и BOT_ID в список админов
-    #ADMINS_LIST = [OWNER_ID, BOT_ID]    
-    #for q in result:
-       #w = q[0] # здесь мы избавляемся от запятой        
-       #ADMINS_LIST.append(w)
-# получаем список админов 2 способ, мой с admins_filter
-    #moderators() 
-    #if message.from_user.id in ADMINS_LIST:           
+        
         keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
         keyboard.add(types.InlineKeyboardButton(text="Рассылка"))
         keyboard.add(types.InlineKeyboardButton(text="Добавить в ЧС"))
